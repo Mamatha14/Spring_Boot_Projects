@@ -7,10 +7,10 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.client.RestTemplate;
-
 import java.util.List;
+
+//Provides the services for creating new customer details and obtaining the details
 
 @Service
 public class CustomerService {
@@ -18,25 +18,28 @@ public class CustomerService {
     @Autowired
     CustomerRepo customerRepo;
 
-//    @Autowired
-  //  RestTemplate restTemplate;
+    @Autowired
+    RestTemplate restTemplate;
 
+    //Obtaining all CustomerDetails
     public List<Customer> getCustomerDetails(){
+
         return (List<Customer>) customerRepo.findAll();
     }
 
-    public void createNewCustomer(Customer customer){
-      /*
-        String customerId = customer.getCustomerID();
+    //Creating new customer
+    public void createNewCustomer(Customer customer) {
+
         HttpHeaders header = new HttpHeaders();
         header.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> httpEntity = new HttpEntity<>(customerId,header);
-        Long accNo = restTemplate.postForObject("http://accounts/createNewAccount",
-                httpEntity,Long.class);
-        customerRepo.save(new Customer(customer.getCustomerID(), customer.getCustomerName(),
-                customer.getMobileNo(), customer.getMailID(),customer.getDob()));
-
-       */
         customerRepo.save(customer);
+
+        //Obtaining customerID as it is unique id for customer appln and acts as foreign key for accounts appln
+        //and corresponding accounts data is set.
+        String customerId = customer.getCustomerID();
+        HttpEntity<String> httpEntity = new HttpEntity<>(customerId, header);
+
+        //RestTemplate to communicate with Account application which is identified by using the URL
+        restTemplate.postForObject("http://account-application/accounts/createNewAccount", httpEntity, Long.class);
     }
 }
