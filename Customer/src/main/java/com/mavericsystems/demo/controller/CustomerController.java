@@ -1,11 +1,18 @@
 package com.mavericsystems.demo.controller;
 
+import com.mavericsystems.demo.feign.AccountFeign;
+import com.mavericsystems.demo.model.Account;
 import com.mavericsystems.demo.model.Customer;
+import com.mavericsystems.demo.model.CustomerAccountResponse;
 import com.mavericsystems.demo.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("customer")  // top-level mapping
@@ -14,14 +21,50 @@ public class CustomerController {
     @Autowired
     CustomerService customerService;
 
-    @GetMapping("/getCustomerInfo") //get mapping for obtaining the customer details
-    public List<Customer> getCustomerDetails(){
+    @Autowired
+    AccountFeign accountFeign;
 
-        return customerService.getCustomerDetails();
+    @GetMapping("/getCustomerInfo") //get mapping for obtaining the customer details
+    public ResponseEntity<List<Customer>> getCustomerDetails(){
+        return new ResponseEntity<List<Customer>>(customerService.getCustomerDetails(), HttpStatus.OK);
+
     }
 
     @PostMapping("/createNewCustomer") //post mapping for creating customer details
-    public void createNewCustomer(@RequestBody Customer customer){
+    public void createNewCustomer(@Valid @RequestBody Customer customer){
+
+        accountFeign.createAccount(customer.getCustomerID());
         customerService.createNewCustomer(customer);
     }
+
+    @GetMapping("/id/{id}")
+    public ResponseEntity<Customer> getCustomerByID(@PathVariable("id") Integer id){
+        return  new ResponseEntity<Customer>(customerService.getCustomerByID(id).get(),HttpStatus.OK);
+    }
+
+    @GetMapping("/id/ids/{id}")
+    public ResponseEntity<CustomerAccountResponse> getDataByCommonID(@PathVariable("id") Integer id){
+        CustomerAccountResponse caResponse = new CustomerAccountResponse();
+
+        Optional<Customer> customer = customerService.getCustomerByID(id);
+        caResponse.setCustomer(customer.get());
+
+        List<Account> account = accountFeign.getAccountByCustomerId(id);
+//        if(account == null)
+//            throw new AccountNotFoundException("Check the customer ID for account details!!!");
+        caResponse.setAccount(account);
+
+        return  new ResponseEntity<CustomerAccountResponse>(caResponse,HttpStatus.OK);
+    }
+
+    @PutMapping("/updateInfo/{id}")
+    public ResponseEntity<Customer> updateCustomerData(@PathVariable("id") Integer id, @Valid @RequestBody Customer c){
+        return new ResponseEntity<Customer>(customerService.updateCustomerData(id,c),HttpStatus.OK);
+    }
+
+//    @PutMapping("/updateBalance/{id}")
+//    public ResponseEntity<Account> updateAccountBalance(@PathVariable("id") Long id, @Valid @RequestBody Double amt){
+//
+//        return new ResponseEntity<Account>(accountFeign.updateBalance(id,amt),HttpStatus.OK);
+//    }
 }

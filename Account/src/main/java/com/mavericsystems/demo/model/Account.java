@@ -14,10 +14,14 @@ import java.util.Date;
 @NoArgsConstructor
 @Data
 public class Account {
-
-    @GeneratedValue(strategy = GenerationType.AUTO)
     @Id
-    private Long accountNo;
-    private String customerID;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Integer accountNo;
+
+    private Integer customerID;
+    private String ifscCode;
     private Date dateOfCreation;
+    ////////////////////
+    private Double balance;
+  //  private enum accountType{CASH, CURRENT, INSTANT, FIXED_TERM_DEPOSIT};
 }
