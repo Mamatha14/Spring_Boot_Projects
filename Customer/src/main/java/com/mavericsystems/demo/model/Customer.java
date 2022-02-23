@@ -1,16 +1,14 @@
 package com.mavericsystems.demo.model;
 
+import com.mavericsystems.demo.enums.CustomerType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.format.annotation.DateTimeFormat;
-
-import javax.persistence.Column;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
-import java.time.LocalDate;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 //Customer model - includes customer attributes, getter-setter and constructors (created using annotations)
@@ -26,15 +24,18 @@ public class Customer {
 
     @NotBlank(message = "Customer name cannot be empty!!!")
     private String customerName;
-    //@Column(length = 10)
-  //  @Size(min = 10, max = 10)
+
+    @NotNull(message = "Customer mobile number cannot be empty!!!")
+    @Min(10)
     private Long mobileNo;
+
     private String mailID;
-
-    //@DateTimeFormat()
     private Date dob;
-    Address address;
+    private boolean isActive;
 
-    ////////////////
- //   private enum customerType{INDIVIDUAL, JOINT};
+    @NotNull(message = "Customer address cannot be empty!!!")
+    private Address address;
+
+    @NotNull(message = "Customer address cannot be empty!!!")
+    private CustomerType customerType;
 }

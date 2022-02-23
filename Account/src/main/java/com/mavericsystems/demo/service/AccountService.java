@@ -1,5 +1,6 @@
 package com.mavericsystems.demo.service;
 
+import com.mavericsystems.demo.exceptions.AccountsNotFoundException;
 import com.mavericsystems.demo.model.Account;
 import com.mavericsystems.demo.repository.AccountRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,38 +19,46 @@ public class AccountService {
 
     //Obtaining all accounts details present
     public List<Account> getAccounts(){
-
         return (List<Account>) accountRepo.findAll();
     }
 
     //Obtaining an account by accountID
-    public Account getAccountByID(Integer id){
-        return  accountRepo.findById(id).get();
-     /* Optional<Account> account = accountRepo.findById(id);
-        if(!account.isPresent())
-            return null;
-        return accountRepo.findById(id).get();*/
+    public Account getAccountByID(Long id){
+       // return  accountRepo.findById(id).get();
+     Optional<Account> account = accountRepo.findById(id);
+     if(!account.isPresent())
+         throw new AccountsNotFoundException("Check the account number!!!");;
+     return accountRepo.findById(id).get();
     }
 
     //Obtaining account by customerID
     public List<Account> getAccountByCustomerId(Integer id){
-//        Account acc = new Account();
-//        if(acc.getCustomerID()==id)
         return  (List<Account>) accountRepo.findByCustomerID(id);
-        //return null;
     }
 
     //Creating new account
     public Account createAccount(Account account){
+
         return accountRepo.save(account);
     }
 
-    //Adding money to particular customer
-    public  Account addMoney(Integer id, Double money){
-        Account account = accountRepo.findById(id).get();
-        Double bal = account.getBalance()+money;
-        account.setBalance(bal);
-        return accountRepo.save(account);
+    //Deleting Account
+    public List<Account> updateAccountStatus(Integer id){
+        List<Account> accounts = getAccountByCustomerId(id);
+        for(Account account : accounts){
+            account.setActive(false);
+            accountRepo.save(account);
+        }
+        List<Account> accountsUpdated = getAccountByCustomerId(id);
+        return accountsUpdated;
     }
+
+//    //Adding money to particular account
+//    public  Account addMoney(Long id, Double money){
+//        Account account = accountRepo.findById(id).get();
+//        Double bal = account.getBalance()+money;
+//        account.setBalance(bal);
+//        return accountRepo.save(account);
+//    }
 
 }

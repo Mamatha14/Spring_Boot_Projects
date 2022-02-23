@@ -18,11 +18,10 @@ public class CustomErrorDecoder implements ErrorDecoder {
             return  exception;
         }
 
-        if(response.status() == 500){
+        if(response.status() == 503){
             System.out.println("Retrying in ....");
             return new RetryableException(response.status(), "503 error",  response.request().httpMethod(), new Date(),response.request());
         }
-
         return exception;
 
     }

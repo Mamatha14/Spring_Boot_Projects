@@ -37,12 +37,12 @@ public class CustomerController {
         customerService.createNewCustomer(customer);
     }
 
-    @GetMapping("/id/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<Customer> getCustomerByID(@PathVariable("id") Integer id){
         return  new ResponseEntity<Customer>(customerService.getCustomerByID(id).get(),HttpStatus.OK);
     }
 
-    @GetMapping("/id/ids/{id}")
+    @GetMapping("/customerAccounts/{id}")
     public ResponseEntity<CustomerAccountResponse> getDataByCommonID(@PathVariable("id") Integer id){
         CustomerAccountResponse caResponse = new CustomerAccountResponse();
 
@@ -50,8 +50,6 @@ public class CustomerController {
         caResponse.setCustomer(customer.get());
 
         List<Account> account = accountFeign.getAccountByCustomerId(id);
-//        if(account == null)
-//            throw new AccountNotFoundException("Check the customer ID for account details!!!");
         caResponse.setAccount(account);
 
         return  new ResponseEntity<CustomerAccountResponse>(caResponse,HttpStatus.OK);
@@ -62,8 +60,13 @@ public class CustomerController {
         return new ResponseEntity<Customer>(customerService.updateCustomerData(id,c),HttpStatus.OK);
     }
 
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Customer> deleteCustomerData(@PathVariable("id") Integer id){
+        return new ResponseEntity<Customer>(customerService.deleteCustomerData(id), HttpStatus.OK);
+    }
+
 //    @PutMapping("/updateBalance/{id}")
-//    public ResponseEntity<Account> updateAccountBalance(@PathVariable("id") Long id, @Valid @RequestBody Double amt){
+//    public ResponseEntity<Account> updateAccountBalance(@PathVariable("id") Long id, @RequestBody Double amt){
 //
 //        return new ResponseEntity<Account>(accountFeign.updateBalance(id,amt),HttpStatus.OK);
 //    }
