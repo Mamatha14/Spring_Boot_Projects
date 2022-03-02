@@ -13,9 +13,9 @@ public interface AccountFeign{
     @GetMapping("/accounts/customerId/{id}")
     List<Account> getAccountByCustomerId(@PathVariable("id")Integer id);
 
-    @PostMapping("/accounts/createNewAccount")
+    @PostMapping("/accounts/newAccount")
     Account createAccount(@RequestBody Integer id);
 
-    @DeleteMapping("/accounts/updateStatus/{id}")
+    @DeleteMapping("/accounts/{id}")
     List<Account> updateAccountStatus(@PathVariable("id")Integer id);
 }

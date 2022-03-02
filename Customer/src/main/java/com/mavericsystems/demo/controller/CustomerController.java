@@ -9,13 +9,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("customer")  // top-level mapping
+@RequestMapping("customers")  // top-level mapping
 public class CustomerController {
 
     @Autowired
@@ -24,13 +23,12 @@ public class CustomerController {
     @Autowired
     AccountFeign accountFeign;
 
-    @GetMapping("/getCustomerInfo") //get mapping for obtaining the customer details
+    @GetMapping("/") //get mapping for obtaining the customer details
     public ResponseEntity<List<Customer>> getCustomerDetails(){
         return new ResponseEntity<List<Customer>>(customerService.getCustomerDetails(), HttpStatus.OK);
-
     }
 
-    @PostMapping("/createNewCustomer") //post mapping for creating customer details
+    @PostMapping("/newCustomer") //post mapping for creating customer details
     public void createNewCustomer(@Valid @RequestBody Customer customer){
 
         accountFeign.createAccount(customer.getCustomerID());
@@ -55,19 +53,13 @@ public class CustomerController {
         return  new ResponseEntity<CustomerAccountResponse>(caResponse,HttpStatus.OK);
     }
 
-    @PutMapping("/updateInfo/{id}")
+    @PutMapping("/customerInfo/{id}")
     public ResponseEntity<Customer> updateCustomerData(@PathVariable("id") Integer id, @Valid @RequestBody Customer c){
         return new ResponseEntity<Customer>(customerService.updateCustomerData(id,c),HttpStatus.OK);
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Customer> deleteCustomerData(@PathVariable("id") Integer id){
         return new ResponseEntity<Customer>(customerService.deleteCustomerData(id), HttpStatus.OK);
     }
-
-//    @PutMapping("/updateBalance/{id}")
-//    public ResponseEntity<Account> updateAccountBalance(@PathVariable("id") Long id, @RequestBody Double amt){
-//
-//        return new ResponseEntity<Account>(accountFeign.updateBalance(id,amt),HttpStatus.OK);
-//    }
 }

@@ -1,12 +1,14 @@
 package com.mavericsystems.demo.service;
 
+import com.mavericsystems.demo.controller.CustomerController;
 import com.mavericsystems.demo.exceptions.CustomerAlreadyExistsException;
 import com.mavericsystems.demo.exceptions.CustomerNotFoundException;
 import com.mavericsystems.demo.feign.AccountFeign;
 import com.mavericsystems.demo.model.Account;
-import com.mavericsystems.demo.model.Address;
 import com.mavericsystems.demo.model.Customer;
 import com.mavericsystems.demo.repository.CustomerRepo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -23,13 +25,15 @@ public class CustomerService {
     @Autowired
     AccountFeign accountFeign;
 
-    //Obtaining all CustomerDetails
+    private static Logger logger = LoggerFactory.getLogger(CustomerController.class);
+
     public List<Customer> getCustomerDetails(){
+        logger.info("Getting all customer information...");
         return customerRepo.findAll();
     }
 
-    //Creating new customer
     public void createNewCustomer(Customer customer) {
+        logger.info("Adding the new customer...");
         Optional<Customer> customerPresent = customerRepo.findById(customer.getCustomerID());
         if(customerPresent.isPresent())
             throw new CustomerAlreadyExistsException("Customer already exist with same ID!!!");
@@ -37,34 +41,42 @@ public class CustomerService {
     }
 
     public Optional<Customer> getCustomerByID(Integer id){
+        logger.info("Obtaining the customer details based on customer ID...");
         Optional<Customer> customer = customerRepo.findById(id);
-        if(!customer.isPresent())
+        if(!customer.isPresent()) {
+            logger.info("Customer not present, check customer ID...");
             throw new CustomerNotFoundException("Check the customer ID!!!");
+        }
         return customerRepo.findById(id);
     }
 
-    //Updating the customer data
     public Customer updateCustomerData(Integer id, Customer c){
+        logger.info("Updating customer details based on customer ID...");
         Optional<Customer> reqdCustomer = customerRepo.findById(id); //checks if the data present or not n if not then returns null/false
-        if(!reqdCustomer.isPresent())
+        if(!reqdCustomer.isPresent()) {
+            logger.info("Customer not present, check customer ID...");
             throw new CustomerNotFoundException("Check the customer ID for update operation!!!");
-        //obtains value present
+        }
         Customer customer = reqdCustomer.get();        //.orElseThrow(() -> new ResourceNot FoundEception("cust not found::"+id));
         customer.setMobileNo(c.getMobileNo());
         customer.setMailID(c.getMailID());
         customer.setAddress(c.getAddress());
+
         Customer customerUpdated = customerRepo.save(customer);
         return customerUpdated;
     }
 
     public Customer deleteCustomerData(Integer id){
-        Optional<Customer> customer = getCustomerByID(id);
-        if(!customer.isPresent())
+        logger.info("Soft deletion based on customer ID...");
+        Customer customer = getCustomerByID(id).get();
+        if(customer==null){
+            logger.info("Customer not present, check customer ID...");
             throw new CustomerNotFoundException("Check the customer ID!!!");
-        customer.get().setActive(false);
-        customerRepo.save(customer.get());
+        }
+        customer.setActive(false);
+        customerRepo.save(customer);
         List<Account> accountLists = (List<Account>) accountFeign.updateAccountStatus(id);
-        customer = getCustomerByID(id);
-        return customer.get();
+        customer = getCustomerByID(id).get();
+        return customer;
     }
 }

@@ -21,6 +21,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler({CustomerNotFoundException.class})
     ResponseEntity customerNotFoundHandler(Exception e, ServletWebRequest request){
+
         APIError apiError = new APIError();
         apiError.setStatus(HttpStatus.NOT_FOUND);
         apiError.setErrors(Arrays.asList(e.getMessage()));

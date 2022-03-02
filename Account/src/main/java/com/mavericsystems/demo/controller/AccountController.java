@@ -19,7 +19,7 @@ public class AccountController {
     @Autowired
     AccountService accountService;
 
-    @GetMapping("/getAccountInfo")  //mapping for obtaining the all account details
+    @GetMapping("/")  //mapping for obtaining the all account details
     public ResponseEntity<List<Account>> getAccounts(){
         return new ResponseEntity<List<Account>>(accountService.getAccounts(), HttpStatus.OK);
     }
@@ -36,7 +36,7 @@ public class AccountController {
         return new ResponseEntity<List<Account>>(accountService.getAccountByCustomerId(id),HttpStatus.OK);
     }
 
-    @PostMapping("/createNewAccount") //mapping for creating new account
+    @PostMapping("/newAccount") //mapping for creating new account
     public ResponseEntity<Account> createAccount(@RequestBody Integer id){
         Account account = new Account();
         account.setCustomerID(id);
@@ -48,13 +48,8 @@ public class AccountController {
         return new ResponseEntity<Account>(accountService.createAccount(account), HttpStatus.OK);
     }
 
-    @DeleteMapping("/updateStatus/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<List<Account>> updateAccountStatus(@PathVariable("id") Integer id){
         return new ResponseEntity<List<Account>>(accountService.updateAccountStatus(id), HttpStatus.OK);
     }
-
-//    @PutMapping("/updateBalance/{id}")
-//    public ResponseEntity<Account> updateBalance(@PathVariable("id") Long id, @RequestBody Double money){
-//        return new ResponseEntity<Account>(accountService.addMoney(id, money), HttpStatus.OK);
-//    }
 }

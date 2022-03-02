@@ -10,7 +10,7 @@ public class RouteConfig {
     @Bean
     public RouteLocator gatewayRoutes(RouteLocatorBuilder routeLocatorBuilder) {
         return routeLocatorBuilder.routes()
-                .route("customer-application", rt -> rt.path("/customer/**")
+                .route("customer-application", rt -> rt.path("/customers/**")
                         .uri("http://localhost:8083/"))
                 .route("account-application", rt -> rt.path("/accounts/**")
                         .uri("http://localhost:8082/"))
